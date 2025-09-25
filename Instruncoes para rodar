@@ -1,0 +1,14 @@
+No codespace
+
+
+Caminho correto
+
+Entra na pasta interna onde está o pom.xml + src:
+
+cd sistema_multiagentes_jadex_db_integrated
+
+
+Depois roda:
+
+mvn clean compile
+mvn exec:java
