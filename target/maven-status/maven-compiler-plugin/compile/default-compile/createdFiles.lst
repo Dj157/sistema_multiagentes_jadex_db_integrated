@@ -1,0 +1,8 @@
+com/unieuro/Main.class
+com/unieuro/agents/AgenteRecomendacao.class
+com/unieuro/agents/AgenteAnalisadorEmocional.class
+com/unieuro/database/DatabaseManager.class
+com/unieuro/agents/HelloAgent.class
+com/unieuro/agents/AgenteColetaDados.class
+com/unieuro/agents/AgenteAnalisadorEmocional$AnaliseEmocional.class
+com/unieuro/agents/AgenteColetaDados$DadosSaude.class
