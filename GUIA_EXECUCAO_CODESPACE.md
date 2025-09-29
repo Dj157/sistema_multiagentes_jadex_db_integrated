@@ -1,5 +1,17 @@
 # 🚀 Guia de Execução no VS Code Codespace
 
+Caminho correto
+
+Entra na pasta interna onde está o pom.xml + src:
+
+cd sistema_multiagentes_jadex_db_integrated
+
+
+Depois roda:
+
+mvn clean compile
+mvn exec:java
+
 ## ✅ Sistema Testado e Funcionando!
 
 O sistema multiagente Jadex com integração de banco de dados foi **testado com sucesso** e está funcionando perfeitamente. Aqui está o guia completo para executar no seu Codespace.
