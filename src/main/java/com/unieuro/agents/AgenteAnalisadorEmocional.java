@@ -13,16 +13,13 @@ import java.util.logging.Logger;
 
 /**
  * Agente responsável por analisar dados de saúde e identificar riscos emocionais.
- * Processa dados do banco e gera análises emocionais.
+ * Processa dados do banco e gera análises emocionais para todos os usuários cadastrados.
  */
 @Agent
 public class AgenteAnalisadorEmocional {
     
     private static final Logger logger = Logger.getLogger(AgenteAnalisadorEmocional.class.getName());
     private DatabaseManager dbManager;
-    
-    @AgentArgument
-    private long idIdoso = 1; // ID do idoso a ser analisado
     
     @AgentArgument
     private int intervaloAnalise = 15000; // Intervalo em milissegundos (15 segundos)
@@ -38,16 +35,71 @@ public class AgenteAnalisadorEmocional {
      */
     @OnStart
     void iniciarAnalise(IInternalAccess me) {
-        logger.info("Agente Analisador Emocional iniciado para idoso ID: " + idIdoso);
+        logger.info("Agente Analisador Emocional iniciado para TODOS os usuários cadastrados");
         
         // Inicializa o gerenciador de banco de dados
         dbManager = DatabaseManager.getInstance();
         
-        // Inicia a análise periódica
+        // Inicia a análise periódica para todos os usuários
         me.repeatStep(5000, intervaloAnalise, dummy -> {
-            analisarDadosRecentes();
+            analisarTodosUsuarios();
             return IFuture.DONE;
         });
+    }
+    
+    /**
+     * Analisa dados de saúde para todos os usuários cadastrados.
+     */
+    private void analisarTodosUsuarios() {
+        try {
+            // Buscar todos os idosos cadastrados
+            List<Map<String, Object>> idosos = dbManager.listarIdosos();
+            
+            for (Map<String, Object> idoso : idosos) {
+                Long idIdoso = (Long) idoso.get("id");
+                String nome = (String) idoso.get("nome");
+                
+                analisarDadosRecentesUsuario(idIdoso, nome);
+            }
+            
+        } catch (Exception e) {
+            logger.severe("Erro ao analisar dados de todos os usuários: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Analisa os dados mais recentes de um usuário específico.
+     */
+    private void analisarDadosRecentesUsuario(Long idIdoso, String nome) {
+        try {
+            // Busca dados dos últimos 3 dias
+            List<Map<String, Object>> dadosRecentes = dbManager.buscarDadosSaudeRecentes(idIdoso, 3);
+            
+            if (dadosRecentes.isEmpty()) {
+                logger.warning("Nenhum dado encontrado para análise de " + nome + " (ID: " + idIdoso + ")");
+                return;
+            }
+            
+            // Analisa os dados mais recentes
+            Map<String, Object> dadosMaisRecentes = dadosRecentes.get(0);
+            AnaliseEmocional analise = analisarDados(dadosMaisRecentes, dadosRecentes);
+            
+            // Salva a análise no banco
+            dbManager.inserirAnaliseEmocional(idIdoso, analise.nivelRisco, analise.descricao);
+            
+            logger.info(String.format(
+                "[%s] Análise realizada - Risco: %s, Descrição: %s",
+                nome, analise.nivelRisco, analise.descricao
+            ));
+            
+            // Se há risco, pode notificar o agente de recomendação
+            if (!"baixo".equals(analise.nivelRisco)) {
+                logger.warning("ALERTA: Risco " + analise.nivelRisco + " detectado para " + nome + " (ID: " + idIdoso + ")");
+            }
+            
+        } catch (Exception e) {
+            logger.severe("Erro na análise emocional para " + nome + ": " + e.getMessage());
+        }
     }
     
     /**

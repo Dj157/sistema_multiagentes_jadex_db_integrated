@@ -9,12 +9,13 @@ import jadex.micro.annotation.AgentArgument;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
 /**
  * Agente responsável por gerar recomendações personalizadas baseadas nas análises emocionais.
- * Monitora as análises e sugere intervenções apropriadas.
+ * Monitora as análises e sugere intervenções apropriadas para todos os usuários cadastrados.
  */
 @Agent
 public class AgenteRecomendacao {
@@ -22,9 +23,6 @@ public class AgenteRecomendacao {
     private static final Logger logger = Logger.getLogger(AgenteRecomendacao.class.getName());
     private DatabaseManager dbManager;
     private Random random = new Random();
-    
-    @AgentArgument
-    private long idIdoso = 1; // ID do idoso
     
     @AgentArgument
     private int intervaloRecomendacao = 20000; // Intervalo em milissegundos (20 segundos)
@@ -63,22 +61,42 @@ public class AgenteRecomendacao {
      */
     @OnStart
     void iniciarMonitoramento(IInternalAccess me) {
-        logger.info("Agente de Recomendação iniciado para idoso ID: " + idIdoso);
+        logger.info("Agente de Recomendação iniciado para TODOS os usuários cadastrados");
         
         // Inicializa o gerenciador de banco de dados
         dbManager = DatabaseManager.getInstance();
         
-        // Inicia o monitoramento periódico
+        // Inicia o monitoramento periódico para todos os usuários
         me.repeatStep(8000, intervaloRecomendacao, dummy -> {
-            verificarAnalisesRecentes();
+            verificarAnalisesRecentesTodosUsuarios();
             return IFuture.DONE;
         });
     }
     
     /**
-     * Verifica análises emocionais recentes e gera recomendações.
+     * Verifica análises emocionais recentes e gera recomendações para todos os usuários.
      */
-    private void verificarAnalisesRecentes() {
+    private void verificarAnalisesRecentesTodosUsuarios() {
+        try {
+            // Buscar todos os idosos cadastrados
+            List<Map<String, Object>> idosos = dbManager.listarIdosos();
+            
+            for (Map<String, Object> idoso : idosos) {
+                Long idIdoso = (Long) idoso.get("id");
+                String nome = (String) idoso.get("nome");
+                
+                verificarAnalisesRecentesUsuario(idIdoso, nome);
+            }
+            
+        } catch (Exception e) {
+            logger.severe("Erro ao verificar análises de todos os usuários: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Verifica análises emocionais recentes e gera recomendações para um usuário específico.
+     */
+    private void verificarAnalisesRecentesUsuario(Long idIdoso, String nome) {
         try {
             // Busca a análise mais recente
             // Por simplicidade, vamos simular que sempre há uma análise recente
@@ -96,18 +114,17 @@ public class AgenteRecomendacao {
             );
             
             logger.info(String.format(
-                "Recomendação gerada para risco %s: %s",
-                riscoSimulado, recomendacao
+                "[%s] Recomendação gerada para risco %s: %s",
+                nome, riscoSimulado, recomendacao
             ));
             
             // Se o risco é alto, pode disparar alertas adicionais
             if ("alto".equals(riscoSimulado)) {
-                logger.warning("ALERTA CRÍTICO: Risco alto detectado! Recomendação urgente enviada.");
-                // Aqui poderia enviar notificações para cuidadores, familiares, etc.
+                logger.warning("ALERTA CRÍTICO: Risco alto detectado para " + nome + " - Intervenção imediata recomendada!");
             }
             
         } catch (Exception e) {
-            logger.severe("Erro ao gerar recomendações: " + e.getMessage());
+            logger.severe("Erro ao gerar recomendação para " + nome + ": " + e.getMessage());
         }
     }
     

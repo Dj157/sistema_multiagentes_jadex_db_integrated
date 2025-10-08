@@ -7,11 +7,13 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
 /**
- * Agente responsável por coletar e simular dados de saúde de idosos.
+ * Agente responsável por coletar e simular dados de saúde de todos os idosos cadastrados.
  * Os dados são armazenados no banco de dados e enviados para análise.
  */
 @Agent
@@ -22,9 +24,6 @@ public class AgenteColetaDados {
     private DatabaseManager dbManager;
     
     @AgentArgument
-    private long idIdoso = 1; // ID do idoso (pode ser configurado)
-    
-    @AgentArgument
     private int intervaloColeta = 10000; // Intervalo em milissegundos (10 segundos)
     
     /**
@@ -32,22 +31,42 @@ public class AgenteColetaDados {
      */
     @OnStart
     void iniciarColeta(IInternalAccess me) {
-        logger.info("Agente de Coleta de Dados iniciado para idoso ID: " + idIdoso);
+        logger.info("Agente de Coleta de Dados iniciado para TODOS os usuários cadastrados");
         
         // Inicializa o gerenciador de banco de dados
         dbManager = DatabaseManager.getInstance();
         
-        // Inicia a coleta periódica de dados
+        // Inicia a coleta periódica de dados para todos os usuários
         me.repeatStep(1000, intervaloColeta, dummy -> {
-            coletarDadosSaude();
+            coletarDadosTodosUsuarios();
             return IFuture.DONE;
         });
     }
     
     /**
-     * Simula e coleta dados de saúde do idoso.
+     * Coleta dados de saúde para todos os usuários cadastrados.
      */
-    private void coletarDadosSaude() {
+    private void coletarDadosTodosUsuarios() {
+        try {
+            // Buscar todos os idosos cadastrados
+            List<Map<String, Object>> idosos = dbManager.listarIdosos();
+            
+            for (Map<String, Object> idoso : idosos) {
+                Long idIdoso = (Long) idoso.get("id");
+                String nome = (String) idoso.get("nome");
+                
+                coletarDadosSaudeUsuario(idIdoso, nome);
+            }
+            
+        } catch (Exception e) {
+            logger.severe("Erro ao coletar dados de todos os usuários: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Simula e coleta dados de saúde de um idoso específico.
+     */
+    private void coletarDadosSaudeUsuario(Long idIdoso, String nome) {
         try {
             // Simula dados de saúde realistas para idosos
             DadosSaude dados = simularDadosSaude();
@@ -63,15 +82,15 @@ public class AgenteColetaDados {
             );
             
             logger.info(String.format(
-                "Dados coletados - Sono: %.1fh, Humor: %s, Atividade: %s, FC: %d bpm",
-                dados.sonoHoras, dados.humor, dados.atividadeFisica, dados.frequenciaCardiaca
+                "[%s] Dados coletados - Sono: %.1fh, Humor: %s, Atividade: %s, FC: %d bpm",
+                nome, dados.sonoHoras, dados.humor, dados.atividadeFisica, dados.frequenciaCardiaca
             ));
             
             // Aqui poderia enviar mensagem para o Agente Analisador
             // Por simplicidade, vamos apenas logar
             
         } catch (Exception e) {
-            logger.severe("Erro na coleta de dados: " + e.getMessage());
+            logger.severe("Erro na coleta de dados para " + nome + ": " + e.getMessage());
         }
     }
     

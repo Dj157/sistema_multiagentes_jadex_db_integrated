@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 /**
  * Controlador REST para fornecer dados de saúde para o dashboard web.
+ * Suporta múltiplos usuários e fornece endpoints para seleção e visualização de dados.
  */
 @RestController
 @RequestMapping("/api")
@@ -23,39 +24,17 @@ public class HealthDataController {
     public HealthDataController() {
         this.dbManager = DatabaseManager.getInstance();
     }
-    
+
     /**
-     * Endpoint para obter dados de saúde recentes de um idoso.
+     * Endpoint raiz para verificar se a API está rodando.
      */
-    @GetMapping("/health-data/{idIdoso}")
-    public ResponseEntity<List<Map<String, Object>>> getHealthData(@PathVariable long idIdoso) {
-        try {
-            List<Map<String, Object>> dados = dbManager.buscarDadosSaudeRecentes(idIdoso, 7);
-            return ResponseEntity.ok(dados);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    @GetMapping("/")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("API de Monitoramento de Saúde Mental está rodando!");
     }
     
     /**
-     * Endpoint para obter dados de saúde mais recentes de um idoso.
-     */
-    @GetMapping("/latest-data/{idIdoso}")
-    public ResponseEntity<Map<String, Object>> getLatestData(@PathVariable long idIdoso) {
-        try {
-            List<Map<String, Object>> dados = dbManager.buscarDadosSaudeRecentes(idIdoso, 1);
-            if (!dados.isEmpty()) {
-                return ResponseEntity.ok(dados.get(0));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-    
-    /**
-     * Endpoint para obter lista de idosos cadastrados.
+     * Endpoint para obter lista de todos os idosos cadastrados.
      */
     @GetMapping("/patients")
     public ResponseEntity<List<Map<String, Object>>> getPatients() {
@@ -68,16 +47,80 @@ public class HealthDataController {
     }
     
     /**
-     * Endpoint para obter estatísticas de risco.
+     * Endpoint para obter dados de saúde recentes de um idoso específico.
      */
-    @GetMapping("/risk-stats")
-    public ResponseEntity<Map<String, Object>> getRiskStats() {
+    @GetMapping("/health-data/{idIdoso}")
+    public ResponseEntity<List<Map<String, Object>>> getHealthData(@PathVariable long idIdoso) {
         try {
-            // Simulação de estatísticas de risco
+            List<Map<String, Object>> dados = dbManager.buscarDadosSaudeRecentes(idIdoso, 7);
+            return ResponseEntity.ok(dados);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Endpoint para obter dados de saúde mais recentes de um idoso específico.
+     */
+    @GetMapping("/latest-data/{idIdoso}")
+    public ResponseEntity<Map<String, Object>> getLatestData(@PathVariable long idIdoso) {
+        try {
+            List<Map<String, Object>> dados = dbManager.buscarDadosSaudeRecentes(idIdoso, 1);
+            if (!dados.isEmpty()) {
+                return ResponseEntity.ok(dados.get(0));
+            } else {
+                // Retorna dados padrão se não houver dados
+                Map<String, Object> defaultData = new HashMap<>();
+                defaultData.put("sono_horas", 7.0);
+                defaultData.put("humor", "neutro");
+                defaultData.put("atividade_fisica", "leve");
+                defaultData.put("frequencia_cardiaca", 75);
+                return ResponseEntity.ok(defaultData);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Endpoint para obter estatísticas de risco de um idoso específico.
+     */
+    @GetMapping("/risk-stats/{idIdoso}")
+    public ResponseEntity<Map<String, Object>> getRiskStats(@PathVariable long idIdoso) {
+        try {
+            // Simulação de estatísticas de risco baseadas no usuário
             Map<String, Object> stats = new HashMap<>();
-            stats.put("baixo", 60);
-            stats.put("moderado", 30);
-            stats.put("alto", 10);
+            
+            // Variação baseada no ID do usuário para simular dados diferentes
+            int seed = (int) (idIdoso % 5);
+            switch (seed) {
+                case 0:
+                    stats.put("baixo", 70);
+                    stats.put("moderado", 25);
+                    stats.put("alto", 5);
+                    break;
+                case 1:
+                    stats.put("baixo", 50);
+                    stats.put("moderado", 35);
+                    stats.put("alto", 15);
+                    break;
+                case 2:
+                    stats.put("baixo", 60);
+                    stats.put("moderado", 30);
+                    stats.put("alto", 10);
+                    break;
+                case 3:
+                    stats.put("baixo", 45);
+                    stats.put("moderado", 40);
+                    stats.put("alto", 15);
+                    break;
+                default:
+                    stats.put("baixo", 65);
+                    stats.put("moderado", 25);
+                    stats.put("alto", 10);
+                    break;
+            }
+            
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -85,28 +128,33 @@ public class HealthDataController {
     }
     
     /**
-     * Endpoint para obter análises emocionais recentes.
+     * Endpoint para obter análises emocionais recentes de um idoso específico.
      */
     @GetMapping("/analyses/{idIdoso}")
     public ResponseEntity<List<Map<String, Object>>> getAnalyses(@PathVariable long idIdoso) {
         try {
-            // Por simplicidade, retornamos dados simulados
+            // Por simplicidade, retornamos dados simulados baseados no usuário
             // Em um sistema real, consultaríamos a tabela analises_emocionais
             List<Map<String, Object>> analyses = new ArrayList<>();
             
-            Map<String, Object> analysis1 = new HashMap<>();
-            analysis1.put("id", 1);
-            analysis1.put("data", "2024-01-07");
-            analysis1.put("risco", "moderado");
-            analysis1.put("descricao", "Sono insuficiente e humor baixo detectados");
-            analyses.add(analysis1);
+            // Gera análises simuladas baseadas no ID do usuário
+            String[] riscos = {"baixo", "moderado", "alto"};
+            String[] descricoes = {
+                "Indicadores dentro da normalidade",
+                "Sono insuficiente detectado",
+                "Bom padrão de sono e atividade",
+                "Múltiplos indicadores de risco detectados",
+                "Humor baixo identificado"
+            };
             
-            Map<String, Object> analysis2 = new HashMap<>();
-            analysis2.put("id", 2);
-            analysis2.put("data", "2024-01-06");
-            analysis2.put("risco", "baixo");
-            analysis2.put("descricao", "Indicadores dentro da normalidade");
-            analyses.add(analysis2);
+            for (int i = 0; i < 4; i++) {
+                Map<String, Object> analysis = new HashMap<>();
+                analysis.put("id", i + 1);
+                analysis.put("data", String.format("2024-01-%02d", 7 - i));
+                analysis.put("risco", riscos[(int) ((idIdoso + i) % riscos.length)]);
+                analysis.put("descricao", descricoes[(int) ((idIdoso + i) % descricoes.length)]);
+                analyses.add(analysis);
+            }
             
             return ResponseEntity.ok(analyses);
         } catch (Exception e) {
@@ -115,32 +163,58 @@ public class HealthDataController {
     }
     
     /**
-     * Endpoint para obter recomendações recentes.
+     * Endpoint para obter recomendações recentes de um idoso específico.
      */
     @GetMapping("/recommendations/{idIdoso}")
     public ResponseEntity<List<Map<String, Object>>> getRecommendations(@PathVariable long idIdoso) {
         try {
-            // Por simplicidade, retornamos dados simulados
+            // Por simplicidade, retornamos dados simulados baseados no usuário
             // Em um sistema real, consultaríamos a tabela recomendacoes
             List<Map<String, Object>> recommendations = new ArrayList<>();
             
-            Map<String, Object> rec1 = new HashMap<>();
-            rec1.put("id", 1);
-            rec1.put("recomendacao", "Pratique exercícios de respiração por 10 minutos");
-            rec1.put("tipo", "moderado");
-            recommendations.add(rec1);
+            String[] recomendacoesBaixo = {
+                "Continue mantendo sua rotina saudável",
+                "Pratique exercícios de respiração por 5 minutos",
+                "Ouça música relaxante"
+            };
             
-            Map<String, Object> rec2 = new HashMap<>();
-            rec2.put("id", 2);
-            rec2.put("recomendacao", "Faça uma caminhada de 15-20 minutos");
-            rec2.put("tipo", "moderado");
-            recommendations.add(rec2);
+            String[] recomendacoesModerado = {
+                "Pratique exercícios de respiração por 10 minutos",
+                "Faça uma caminhada de 15-20 minutos",
+                "Pratique meditação ou mindfulness"
+            };
             
-            Map<String, Object> rec3 = new HashMap<>();
-            rec3.put("id", 3);
-            rec3.put("recomendacao", "Continue mantendo sua rotina saudável");
-            rec3.put("tipo", "baixo");
-            recommendations.add(rec3);
+            String[] recomendacoesAlto = {
+                "Entre em contato com um familiar ou cuidador",
+                "Considere conversar com um profissional de saúde",
+                "Evite ficar sozinho por longos períodos"
+            };
+            
+            // Gera recomendações baseadas no ID do usuário
+            String[] tipos = {"baixo", "moderado", "alto"};
+            for (int i = 0; i < 4; i++) {
+                Map<String, Object> recommendation = new HashMap<>();
+                recommendation.put("id", i + 1);
+                
+                String tipo = tipos[(int) ((idIdoso + i) % tipos.length)];
+                recommendation.put("tipo", tipo);
+                
+                String recomendacao;
+                switch (tipo) {
+                    case "baixo":
+                        recomendacao = recomendacoesBaixo[i % recomendacoesBaixo.length];
+                        break;
+                    case "moderado":
+                        recomendacao = recomendacoesModerado[i % recomendacoesModerado.length];
+                        break;
+                    default:
+                        recomendacao = recomendacoesAlto[i % recomendacoesAlto.length];
+                        break;
+                }
+                
+                recommendation.put("recomendacao", recomendacao);
+                recommendations.add(recommendation);
+            }
             
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {
@@ -149,37 +223,33 @@ public class HealthDataController {
     }
     
     /**
-     * Endpoint para verificar status dos agentes.
+     * Endpoint para obter dados de tendências de um idoso específico.
      */
-    @GetMapping("/agents-status")
-    public ResponseEntity<Map<String, Object>> getAgentsStatus() {
+    @GetMapping("/trends/{idIdoso}")
+    public ResponseEntity<List<Map<String, Object>>> getTrends(@PathVariable long idIdoso) {
         try {
-            Map<String, Object> status = new HashMap<>();
+            List<Map<String, Object>> trends = new ArrayList<>();
             
-            Map<String, Object> coletaAgent = new HashMap<>();
-            coletaAgent.put("name", "Agente de Coleta");
-            coletaAgent.put("status", "ativo");
-            coletaAgent.put("description", "Coletando dados a cada 10s");
+            // Gera dados de tendência simulados para os últimos 7 dias
+            for (int i = 6; i >= 0; i--) {
+                Map<String, Object> trend = new HashMap<>();
+                trend.put("data", String.format("2024-01-%02d", 7 - i));
+                
+                // Varia os dados baseado no ID do usuário e dia
+                double baseSono = 6.5 + (idIdoso % 3) * 0.5;
+                double baseHumor = 5 + (idIdoso % 3);
+                double baseAtividade = 20 + (idIdoso % 4) * 10;
+                double baseFC = 70 + (idIdoso % 3) * 5;
+                
+                trend.put("sono", Math.round((baseSono + Math.sin(i) * 1.5) * 10.0) / 10.0);
+                trend.put("humor", Math.max(1, Math.min(10, Math.round(baseHumor + Math.cos(i) * 2))));
+                trend.put("atividade", Math.max(0, Math.round(baseAtividade + Math.sin(i * 0.5) * 15)));
+                trend.put("frequencia_cardiaca", Math.max(60, Math.round(baseFC + Math.cos(i * 0.7) * 10)));
+                
+                trends.add(trend);
+            }
             
-            Map<String, Object> analysisAgent = new HashMap<>();
-            analysisAgent.put("name", "Agente Analisador");
-            analysisAgent.put("status", "ativo");
-            analysisAgent.put("description", "Analisando a cada 15s");
-            
-            Map<String, Object> recommendationAgent = new HashMap<>();
-            recommendationAgent.put("name", "Agente de Recomendação");
-            recommendationAgent.put("status", "ativo");
-            recommendationAgent.put("description", "Gerando sugestões a cada 20s");
-            
-            List<Map<String, Object>> agents = new ArrayList<>();
-            agents.add(coletaAgent);
-            agents.add(analysisAgent);
-            agents.add(recommendationAgent);
-            
-            status.put("agents", agents);
-            status.put("timestamp", System.currentTimeMillis());
-            
-            return ResponseEntity.ok(status);
+            return ResponseEntity.ok(trends);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

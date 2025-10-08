@@ -132,21 +132,51 @@ public class DatabaseManager {
     private void insertSampleData() throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
             
+            // Verificar se já existem dados
+            String checkData = "SELECT COUNT(*) FROM idosos";
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(checkData)) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    logger.info("Dados já existem no banco, pulando inserção de dados de exemplo.");
+                    return;
+                }
+            }
+            
             // Inserir idosos
             String insertIdosos = "INSERT INTO idosos (nome, idade, sexo) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(insertIdosos)) {
+                // Usuário 1
                 stmt.setString(1, "João Silva");
                 stmt.setInt(2, 70);
                 stmt.setString(3, "M");
                 stmt.executeUpdate();
                 
+                // Usuário 2
                 stmt.setString(1, "Maria Oliveira");
                 stmt.setInt(2, 75);
                 stmt.setString(3, "F");
                 stmt.executeUpdate();
+                
+                // Usuário 3
+                stmt.setString(1, "Carlos Santos");
+                stmt.setInt(2, 68);
+                stmt.setString(3, "M");
+                stmt.executeUpdate();
+                
+                // Usuário 4
+                stmt.setString(1, "Ana Costa");
+                stmt.setInt(2, 72);
+                stmt.setString(3, "F");
+                stmt.executeUpdate();
+                
+                // Usuário 5
+                stmt.setString(1, "Pedro Almeida");
+                stmt.setInt(2, 77);
+                stmt.setString(3, "M");
+                stmt.executeUpdate();
             }
             
-            logger.info("Dados de exemplo inseridos com sucesso!");
+            logger.info("Dados de exemplo inseridos com sucesso! 5 usuários cadastrados.");
         }
     }
     
