@@ -1,4 +1,41 @@
+# Sistema Multiagente Integrado para Monitoramento Emocional
 
+Um sistema distribuído de análise e recomendação emocional, baseado em agentes cognitivos **Jadex (BDI)**, com integração a banco de dados, **API REST Spring Boot** e **dashboard web em React**.  
+O projeto simula o comportamento de sensores virtuais (sono, humor, atividade e frequência cardíaca) para monitorar o bem-estar de idosos e gerar recomendações automáticas personalizadas.
+
+---
+
+## Sumário
+
+1. [Visão Geral](#visão-geral)  
+2. [Arquitetura do Sistema](#arquitetura-do-sistema)  
+3. [Arquitetura Multiagente (Jadex)](#arquitetura-multiagente-jadex)  
+4. [Sensores e Atuadores](#sensores-e-atuadores)  
+5. [Banco de Dados](#banco-de-dados)  
+6. [Interface Web (Dashboard)](#interface-web-dashboard)  
+7. [Instruções de Execução](#instruções-de-execução)  
+8. [Tecnologias Utilizadas](#tecnologias-utilizadas)
+
+---
+
+## Visão Geral
+
+O sistema foi projetado para **simular, analisar e recomendar intervenções emocionais** em um contexto de monitoramento de saúde mental.  
+Ele é composto por três agentes inteligentes Jadex, integrados a um banco de dados relacional e a uma interface web interativa.
+
+### Fluxo Geral do Sistema
+
+[Sensores Simulados]
+↓
+[Agente de Coleta de Dados]
+↓ (insere)
+[Banco de Dados H2/PostgreSQL]
+↓ (consulta)
+[Agente Analisador Emocional]
+↓ (gera)
+[Agente de Recomendação]
+↓ (exposição via API REST)
+[Dashboard Web (React)]
 ---
 
 ## Arquitetura do Sistema
