@@ -117,48 +117,60 @@ Ela exibe os dados dos idosos, gráficos de variação emocional e recomendaçõ
 ---
 ## Instruções de Execução
 
+Siga os passos abaixo em terminais separados quando necessário.
+
 ### 1. Executar o Sistema Multiagente (Jadex)
 
-Abra o terminal e execute os comandos abaixo:
+Abra um terminal e execute:
 
 ```bash
 cd /workspaces/sistema_multiagentes_jadex_db_integrated
 mvn exec:java
-Aguarde os agentes Jadex (com.unieuro.Main) iniciarem.
-Mantenha o terminal aberto para visualizar os logs em tempo real.
+```
 
-2. Iniciar a API REST (Spring Boot)
+Aguarde os agentes Jadex (classe principal: com.unieuro.Main) iniciarem. Mantenha este terminal aberto para visualizar os logs em tempo real.
+
+### 2. Iniciar a API REST (Spring Boot)
+
 Abra outro terminal e execute:
 
-bash
-Copy code
+```bash
 cd /workspaces/sistema_multiagentes_jadex_db_integrated
 mvn spring-boot:run
-A API será iniciada na porta padrão 8080.
-Acesse pelo navegador: http://localhost:8080
+```
 
-3. Iniciar o Dashboard Web (React)
+A API será iniciada na porta padrão 8080. Acesse pelo navegador: http://localhost:8080
+
+### 3. Iniciar o Dashboard Web (React)
+
 Abra outro terminal e execute:
 
-bash
-Copy code
+```bash
 cd /workspaces/sistema_multiagentes_jadex_db_integrated/health-dashboard
 npm install
 npm run dev
-O servidor do dashboard Vite será iniciado.
-Acesse pelo navegador: http://localhost:5173
+```
 
-Tecnologias Utilizadas
-Camada	Tecnologias
-Agentes	Jadex BDI Framework, Java
-Backend	Spring Boot, Maven, HikariCP
-Banco de Dados	H2 (dev) / PostgreSQL (prod)
-Frontend	React, Vite, TailwindCSS, Recharts
-Integração	JDBC, REST API, JSON
+O servidor do dashboard (Vite) será iniciado. Acesse pelo navegador: http://localhost:5173
 
-Repositório
+---
+
+## Tecnologias Utilizadas
+
+| Camada | Tecnologias |
+|--------|-------------|
+| Agentes | Jadex BDI Framework, Java |
+| Backend | Spring Boot, Maven, HikariCP |
+| Banco de Dados | H2 (dev) / PostgreSQL (prod) |
+| Frontend | React, Vite, TailwindCSS, Recharts |
+| Integração | JDBC, REST API, JSON |
+
+---
+
+## Repositório
+
 Clone o repositório e explore o código:
 
-bash
-Copy code
-git clone https://github.com/usuario/sistema_multiagentes_jadex_db_integrated.git
+```bash
+git clone https://github.com/Dj157/sistema_multiagentes_jadex_db_integrated.git
+```
