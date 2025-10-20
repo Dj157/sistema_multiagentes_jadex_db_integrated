@@ -1,138 +1,164 @@
-Sistema Multiagente Integrado para Monitoramento Emocional
+# Sistema Multiagente Integrado para Monitoramento Emocional
 
-Um sistema distribuído de análise e recomendação emocional, baseado em agentes cognitivos Jadex (BDI), com integração a banco de dados, API REST (Spring Boot) e dashboard web (React).
-O projeto simula sensores virtuais (sono, humor, atividade e frequência cardíaca) para monitorar o bem-estar de idosos e gerar recomendações automáticas personalizadas.
+Um sistema distribuído de análise e recomendação emocional, baseado em agentes cognitivos **Jadex (BDI)**, com integração a banco de dados, **API REST Spring Boot** e **dashboard web em React**.  
+O projeto simula o comportamento de sensores virtuais (sono, humor, atividade e frequência cardíaca) para monitorar o bem-estar de idosos e gerar recomendações automáticas personalizadas.
 
-Sumário
+---
 
-Visão Geral
+## Sumário
 
-Arquitetura do Sistema
+1. [Visão Geral](#visão-geral)  
+2. [Arquitetura do Sistema](#arquitetura-do-sistema)  
+3. [Arquitetura Multiagente (Jadex)](#arquitetura-multiagente-jadex)  
+4. [Sensores e Atuadores](#sensores-e-atuadores)  
+5. [Banco de Dados](#banco-de-dados)  
+6. [Interface Web (Dashboard)](#interface-web-dashboard)  
+7. [Instruções de Execução](#instruções-de-execução)  
+8. [Tecnologias Utilizadas](#tecnologias-utilizadas)  
 
-Arquitetura Multiagente (Jadex)
+---
 
-Sensores e Atuadores
+## Visão Geral
 
-Banco de Dados
+O sistema foi projetado para **simular, analisar e recomendar intervenções emocionais** em um contexto de monitoramento de saúde mental.  
+Ele é composto por três agentes inteligentes Jadex, integrados a um banco de dados relacional e a uma interface web interativa.
 
-Interface Web (Dashboard)
+### Fluxo Geral do Sistema
 
-Instruções de Execução
-
-Tecnologias Utilizadas
-
-1. Visão Geral
-
-O sistema foi projetado para simular, analisar e recomendar intervenções emocionais em um contexto de monitoramento de saúde mental.
-É composto por três agentes inteligentes Jadex integrados a um banco de dados relacional e a uma interface web interativa.
-
-Fluxo geral:
-
-[Sensores simulados]
-      ↓
-[Agente de Coleta de Dados] 
-      ↓ (insere)
+[Sensores Simulados]
+↓
+[Agente de Coleta de Dados]
+↓ (insere)
 [Banco de Dados H2/PostgreSQL]
-      ↓ (consulta)
+↓ (consulta)
 [Agente Analisador Emocional]
-      ↓ (gera)
+↓ (gera)
 [Agente de Recomendação]
-      ↓ (exposição via API REST)
+↓ (exposição via API REST)
 [Dashboard Web (React)]
 
-2. Arquitetura do Sistema
-Camada	Função	Tecnologias	Comunicação
-Agentes Inteligentes (Jadex)	Simulam e analisam dados de saúde mental	Jadex BDI + Java	Acesso direto ao banco
-Banco de Dados (Persistência)	Armazena dados e resultados dos agentes	H2 (dev) / PostgreSQL (prod)	JDBC (HikariCP)
-API REST (Backend)	Expõe endpoints para o frontend	Spring Boot + Maven	HTTP (porta 8080)
-Dashboard Web (Frontend)	Visualiza dados e análises	React + Vite + Tailwind + Recharts	HTTP (porta 5173)
-3. Arquitetura Multiagente (Jadex)
+yaml
+Copy code
 
-Os agentes seguem o modelo BDI (Belief–Desire–Intention), cada um com crenças, objetivos e planos próprios.
+---
 
-Agente	Tipo	Função	Comunicação
-Agente de Coleta de Dados	Sensor / Produtor	Simula sinais de saúde (sono, humor, atividade, FC) e grava no banco	DatabaseManager.inserirDadosSaude()
-Agente Analisador Emocional	Processador / Avaliador	Avalia dados recentes e classifica risco emocional (baixo/médio/alto)	DatabaseManager.buscarDadosSaudeRecentes()
-Agente de Recomendação	Atuador / Orientador	Gera recomendações personalizadas com base na análise emocional	DatabaseManager.inserirRecomendacao()
-4. Sensores e Atuadores
-Categoria	Elemento	Tipo	Função	Origem/Destino
-Sensor	Sono (horas e qualidade)	Virtual	Mede descanso e recuperação emocional	Agente de Coleta
-Sensor	Humor	Virtual	Mede estado afetivo	Agente de Coleta
-Sensor	Atividade Física	Virtual	Indica movimento e engajamento	Agente de Coleta
-Sensor	Frequência Cardíaca	Virtual	Indica estresse e saúde física	Agente de Coleta
-Atuador	Análise Emocional	Lógico	Determina nível de risco emocional	Agente Analisador → Banco
-Atuador	Recomendações	Cognitivo	Gera ações preventivas e orientações	Agente de Recomendação → Banco/API
-Atuador	Visualização	Interativo	Exibe dados e alertas	API REST → Frontend
-5. Banco de Dados
+## Arquitetura do Sistema
 
-O módulo DatabaseManager.java centraliza toda a persistência de dados, integrando os agentes e a API REST.
+| Camada | Função | Tecnologias | Comunicação |
+|--------|--------|------------|-------------|
+| Agentes Inteligentes (Jadex) | Simulam e analisam dados de saúde mental | Jadex BDI + Java | Acesso direto ao banco |
+| Banco de Dados (Persistência) | Armazena dados de sensores, análises e recomendações | H2 (dev) / PostgreSQL (prod) | JDBC (HikariCP) |
+| API REST (Backend) | Expõe endpoints para frontend | Spring Boot + Maven | HTTP (porta 8080) |
+| Dashboard Web (Frontend) | Visualiza dados e análises | React + Vite + Tailwind + Recharts | Requisições HTTP |
 
-Principais tabelas:
+---
 
-Tabela	Descrição
-idosos	Cadastro dos usuários monitorados
-dados_saude	Dados simulados dos sensores
-analises_emocionais	Classificações de risco
-recomendacoes	Sugestões personalizadas
+## Arquitetura Multiagente (Jadex)
 
-Funções principais:
+Os agentes seguem o modelo **BDI (Belief–Desire–Intention)**, cada um com crenças, objetivos e planos próprios.
 
-inserirDadosSaude() → grava dados dos sensores
+| Agente | Tipo | Função | Comunicação |
+|--------|------|--------|-------------|
+| Agente de Coleta de Dados | Sensor / Produtor | Simula sinais de saúde (sono, humor, atividade, FC) e grava no banco | `DatabaseManager.inserirDadosSaude()` |
+| Agente Analisador Emocional | Processador / Avaliador | Avalia dados recentes e classifica risco emocional (baixo/médio/alto) | `DatabaseManager.buscarDadosSaudeRecentes()` |
+| Agente de Recomendação | Atuador / Orientador | Gera recomendações personalizadas | `DatabaseManager.inserirRecomendacao()` |
 
-buscarDadosSaudeRecentes() → consulta últimas medições
+---
 
-inserirAnaliseEmocional() → registra o risco detectado
+## Sensores e Atuadores
 
-inserirRecomendacao() → salva recomendações
+| Categoria | Elemento | Tipo | Função | Origem/Destino |
+|-----------|----------|------|--------|----------------|
+| Sensor | Sono (horas e qualidade) | Virtual | Mede descanso e recuperação emocional | Agente de Coleta |
+| Sensor | Humor | Virtual | Mede estado afetivo | Agente de Coleta |
+| Sensor | Atividade Física | Virtual | Indica movimento e engajamento | Agente de Coleta |
+| Sensor | Frequência Cardíaca | Virtual | Indica estresse e saúde física | Agente de Coleta |
+| Atuador | Análise Emocional | Lógico | Determina nível de risco emocional | Agente Analisador → Banco |
+| Atuador | Recomendações | Cognitivo | Gera ações preventivas e orientações | Agente de Recomendação → Banco/API |
+| Atuador | Visualização | Interativo | Exibe dados e alertas | API REST → Frontend |
 
-listarIdosos() → fornece dados para a API REST
+---
 
-6. Interface Web (Dashboard)
+## Banco de Dados
 
-A interface web foi desenvolvida em React + Vite, com foco em clareza e interatividade.
+O módulo `DatabaseManager.java` centraliza toda a persistência de dados, integrando os agentes e a API REST.
+
+### Principais Tabelas
+
+| Tabela | Descrição |
+|--------|-----------|
+| `idosos` | Cadastro dos usuários monitorados |
+| `dados_saude` | Dados simulados dos sensores |
+| `analises_emocionais` | Classificações de risco |
+| `recomendacoes` | Sugestões personalizadas |
+
+### Funções Principais
+
+- `inserirDadosSaude()` → grava dados dos sensores  
+- `buscarDadosSaudeRecentes()` → consulta últimas medições  
+- `inserirAnaliseEmocional()` → registra o risco detectado  
+- `inserirRecomendacao()` → salva recomendações  
+- `listarIdosos()` → fornece dados para a API REST  
+
+---
+
+## Interface Web (Dashboard)
+
+A interface web foi desenvolvida em **React + Vite**, com foco em clareza e interatividade.  
 Ela exibe os dados dos idosos, gráficos de variação emocional e recomendações geradas pelos agentes.
 
-Principais funcionalidades:
+### Principais Funcionalidades
 
-Visualização de métricas (humor, sono, atividade, frequência cardíaca)
+- Visualização de métricas (humor, sono, atividade, FC)  
+- Classificação de risco emocional em tempo real  
+- Exibição de recomendações personalizadas  
+- Atualização automática via API REST  
 
-Classificação de risco emocional em tempo real
+---
+## Instruções de Execução
 
-Exibição de recomendações personalizadas
+### 1. Executar o Sistema Multiagente (Jadex)
 
-Atualização automática via API REST
+Abra o terminal e execute os comandos abaixo:
 
-7. Instruções de Execução
-Terminal 1 — Sistema Multiagente (Jadex)
+```bash
 cd /workspaces/sistema_multiagentes_jadex_db_integrated
 mvn exec:java
+Aguarde os agentes Jadex (com.unieuro.Main) iniciarem.
+Mantenha o terminal aberto para visualizar os logs em tempo real.
 
+2. Iniciar a API REST (Spring Boot)
+Abra outro terminal e execute:
 
-Executa os agentes (com.unieuro.Main).
-
-Terminal 2 — API REST (Spring Boot)
+bash
+Copy code
 cd /workspaces/sistema_multiagentes_jadex_db_integrated
 mvn spring-boot:run
+A API será iniciada na porta padrão 8080.
+Acesse pelo navegador: http://localhost:8080
 
+3. Iniciar o Dashboard Web (React)
+Abra outro terminal e execute:
 
-Inicia a API REST na porta 8080.
-Acesse em: http://localhost:8080
-
-Terminal 3 — Dashboard Web (React)
+bash
+Copy code
 cd /workspaces/sistema_multiagentes_jadex_db_integrated/health-dashboard
 npm install
 npm run dev
+O servidor do dashboard Vite será iniciado.
+Acesse pelo navegador: http://localhost:5173
 
-
-Inicia o servidor Vite na porta 5173.
-Acesse em: http://localhost:5173
-
-8. Tecnologias Utilizadas
+Tecnologias Utilizadas
 Camada	Tecnologias
 Agentes	Jadex BDI Framework, Java
 Backend	Spring Boot, Maven, HikariCP
-Banco de Dados	H2 (dev), PostgreSQL (prod)
+Banco de Dados	H2 (dev) / PostgreSQL (prod)
 Frontend	React, Vite, TailwindCSS, Recharts
 Integração	JDBC, REST API, JSON
 
-D
+Repositório
+Clone o repositório e explore o código:
+
+bash
+Copy code
+git clone https://github.com/usuario/sistema_multiagentes_jadex_db_integrated.git
