@@ -1,244 +1,162 @@
-# 🧠 Sistema Multiagente Jadex - Monitoramento de Saúde Mental (Versão com Banco de Dados)
+# Sistema Multiagente Integrado para Monitoramento Emocional
 
-Este projeto implementa um sistema multiagente usando o framework Jadex para monitoramento da saúde mental de pessoas idosas, **agora integrado com banco de dados** para persistência e análise histórica dos dados.
-
-## 🎯 Objetivo
-
-Criar um sistema multiagente BDI (Belief-Desire-Intention) que:
-- ✅ Monitora dados de saúde mental e física de idosos
-- ✅ **Armazena dados em banco de dados H2/PostgreSQL**
-- ✅ Identifica riscos emocionais (ansiedade, estresse, apatia)
-- ✅ Sugere intervenções rápidas e mudanças de rotina
-- ✅ **Mantém histórico para análise de tendências**
-- ✅ Oferece suporte emocional contínuo
-
-## 🏗️ Arquitetura Atualizada
-
-### Componentes do Sistema
-
-1. **Banco de Dados** (H2 para desenvolvimento, PostgreSQL para produção)
-   - Tabela `idosos`: Cadastro dos usuários
-   - Tabela `dados_saude`: Dados coletados (sono, humor, atividade, FC)
-   - Tabela `analises_emocionais`: Resultados das análises
-   - Tabela `recomendacoes`: Sugestões geradas
-
-2. **DatabaseManager** - Gerenciador de conexões e operações do banco
-
-3. **Agentes Jadex**:
-   - **AgenteColetaDados**: Simula e armazena dados de saúde
-   - **AgenteAnalisadorEmocional**: Analisa dados e identifica riscos
-   - **AgenteRecomendacao**: Gera recomendações personalizadas
-
-## 🛠️ Tecnologias
-
-- **Java 17**
-- **Jadex Framework 4.0.241** - Sistema multiagente BDI
-- **H2 Database** - Banco em memória para desenvolvimento
-- **PostgreSQL** - Banco para produção (configurável)
-- **HikariCP** - Pool de conexões
-- **Maven** - Gerenciamento de dependências
-- **SLF4J** - Sistema de logs
-
-## 🚀 Como Executar
-
-### Pré-requisitos
-- Java 17 ou superior
-- Maven 3.6+
-- VS Code com Extension Pack for Java (recomendado)
-
-### Passos
-
-1. **Clone o repositório**:
-```bash
-git clone https://github.com/Dj157/sistema_multiagentes_jadex.git
-cd sistema_multiagentes_jadex/meu-primeiro-jadex
-```
-
-2. **Compile o projeto**:
-```bash
-mvn clean compile
-```
-
-3. **Execute o sistema**:
-```bash
-mvn exec:java
-```
-
-## 📊 Funcionalidades Implementadas
-
-### 🔄 Fluxo de Funcionamento
-
-1. **Inicialização**:
-   - Banco H2 é criado em memória
-   - Tabelas são criadas automaticamente
-   - Dados de exemplo são inseridos (João Silva, Maria Oliveira)
-
-2. **Coleta de Dados** (AgenteColetaDados):
-   - Simula dados realistas a cada 10 segundos
-   - Armazena no banco: sono, humor, atividade física, frequência cardíaca
-   - Dados variam de forma realística baseados em correlações
-
-3. **Análise Emocional** (AgenteAnalisadorEmocional):
-   - Analisa dados a cada 15 segundos
-   - Identifica riscos: baixo, moderado, alto
-   - Considera tendências históricas
-   - Salva análises no banco
-
-4. **Recomendações** (AgenteRecomendacao):
-   - Gera recomendações a cada 20 segundos
-   - Personaliza sugestões baseadas no nível de risco
-   - Armazena recomendações no banco
-
-### 📈 Dados Simulados
-
-- **Sono**: 5.0-9.0 horas (correlacionado com humor)
-- **Qualidade do Sono**: 2-5 (escala 1-5)
-- **Humor**: positivo/neutro/negativo (baseado no sono)
-- **Atividade Física**: sedentária/leve/moderada/intensa
-- **Frequência Cardíaca**: 50-120 bpm (varia com atividade)
-
-### 🎯 Análise de Riscos
-
-**Critérios de Risco**:
-- Sono < 6 horas (+2 pontos)
-- Qualidade sono < 3 (+2 pontos)
-- Humor negativo (+3 pontos)
-- Atividade sedentária (+2 pontos)
-- FC anormal (+1 ponto)
-
-**Níveis**:
-- **Baixo**: 0-2 pontos
-- **Moderado**: 3-5 pontos
-- **Alto**: 6+ pontos
-
-### 💡 Recomendações por Risco
-
-**Risco Baixo**:
-- Manter rotina saudável
-- Exercícios de respiração
-- Música relaxante
-
-**Risco Moderado**:
-- Caminhadas de 15-20 min
-- Meditação/mindfulness
-- Contato social
-
-**Risco Alto**:
-- Contatar familiar/cuidador
-- Buscar profissional de saúde
-- Evitar isolamento
-
-## 🗃️ Estrutura do Banco de Dados
-
-```sql
--- Tabela de idosos cadastrados
-CREATE TABLE idosos (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    idade INT NOT NULL,
-    sexo CHAR(1),
-    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Dados de saúde coletados
-CREATE TABLE dados_saude (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    id_idoso BIGINT REFERENCES idosos(id),
-    data_coleta DATE NOT NULL,
-    sono_horas DECIMAL(3,1),
-    qualidade_sono INT,
-    humor VARCHAR(20),
-    atividade_fisica VARCHAR(50),
-    frequencia_cardiaca INT,
-    observacoes TEXT
-);
-
--- Análises emocionais realizadas
-CREATE TABLE analises_emocionais (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    id_idoso BIGINT REFERENCES idosos(id),
-    data_analise TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    risco_emocional VARCHAR(20),
-    descricao TEXT
-);
-
--- Recomendações geradas
-CREATE TABLE recomendacoes (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    id_idoso BIGINT REFERENCES idosos(id),
-    data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    recomendacao VARCHAR(100),
-    tipo_risco VARCHAR(20),
-    observacoes TEXT
-);
-```
-
-## 📁 Estrutura do Projeto
-
-```
-src/main/java/com/unieuro/
-├── Main.java                           # Classe principal
-├── database/
-│   └── DatabaseManager.java           # Gerenciador do banco
-└── agents/
-    ├── AgenteColetaDados.java         # Coleta e simula dados
-    ├── AgenteAnalisadorEmocional.java # Analisa riscos emocionais
-    └── AgenteRecomendacao.java        # Gera recomendações
-```
-
-## 🔧 Configuração
-
-### Banco H2 (Desenvolvimento)
-- **URL**: `jdbc:h2:mem:saude_mental`
-- **Usuário**: `sa`
-- **Senha**: (vazia)
-- **Console H2**: Disponível em http://localhost:8082 (se habilitado)
-
-### Banco PostgreSQL (Produção)
-Para usar PostgreSQL, altere as configurações em `DatabaseManager.java`:
-
-```java
-config.setJdbcUrl("jdbc:postgresql://localhost:5432/saude_mental");
-config.setUsername("seu_usuario");
-config.setPassword("sua_senha");
-config.setDriverClassName("org.postgresql.Driver");
-```
-
-## 📊 Logs do Sistema
-
-O sistema gera logs detalhados mostrando:
-- Dados coletados em tempo real
-- Análises emocionais realizadas
-- Recomendações geradas
-- Alertas de risco alto
-
-Exemplo de log:
-```
-INFO: Dados coletados - Sono: 7.2h, Humor: positivo, Atividade: moderada, FC: 78 bpm
-INFO: Análise realizada - Risco: baixo, Descrição: Indicadores dentro da normalidade.
-INFO: Recomendação gerada para risco baixo: Continue mantendo sua rotina saudável
-```
-
-## 🎯 Próximos Desenvolvimentos
-
-- [ ] Interface web para visualização dos dados
-- [ ] Dashboard com gráficos e relatórios
-- [ ] Integração com dispositivos IoT reais
-- [ ] Machine Learning para análise preditiva
-- [ ] Sistema de notificações (email, SMS)
-- [ ] API REST para integração externa
-- [ ] Múltiplos idosos simultâneos
-- [ ] Configuração de limiares personalizados
-
-## ⚠️ Aviso Importante
-
-Este sistema é destinado apenas para fins educacionais e de pesquisa. **Não substitui acompanhamento médico ou terapêutico profissional.**
-
-## 🤝 Contribuição
-
-Este é um projeto acadêmico. Contribuições são bem-vindas através de pull requests!
+Um sistema distribuído de análise e recomendação emocional, baseado em agentes cognitivos **Jadex (BDI)**, com integração a banco de dados, **API REST Spring Boot** e **dashboard web em React**.  
+O projeto simula o comportamento de sensores virtuais (sono, humor, atividade e frequência cardíaca) para monitorar o bem-estar de idosos e gerar recomendações automáticas personalizadas.
 
 ---
 
-**Desenvolvido com ❤️ usando Jadex Framework e Java**
+## Sumário
 
+1. [Visão Geral](#visão-geral)  
+2. [Arquitetura do Sistema](#arquitetura-do-sistema)  
+3. [Arquitetura Multiagente (Jadex)](#arquitetura-multiagente-jadex)  
+4. [Sensores e Atuadores](#sensores-e-atuadores)  
+5. [Banco de Dados](#banco-de-dados)  
+6. [Interface Web (Dashboard)](#interface-web-dashboard)  
+7. [Instruções de Execução](#instruções-de-execução)  
+8. [Tecnologias Utilizadas](#tecnologias-utilizadas)
+
+---
+
+## Visão Geral
+
+O sistema foi projetado para **simular, analisar e recomendar intervenções emocionais** em um contexto de monitoramento de saúde mental.  
+Ele é composto por três agentes inteligentes Jadex, integrados a um banco de dados relacional e a uma interface web interativa.
+
+### Fluxo Geral do Sistema
+
+[Sensores Simulados]
+↓
+[Agente de Coleta de Dados]
+↓ (insere)
+[Banco de Dados H2/PostgreSQL]
+↓ (consulta)
+[Agente Analisador Emocional]
+↓ (gera)
+[Agente de Recomendação]
+↓ (exposição via API REST)
+[Dashboard Web (React)]
+
+yaml
+Copy code
+
+---
+
+## Arquitetura do Sistema
+
+| Camada | Função | Tecnologias | Comunicação |
+|---------|---------|--------------|--------------|
+| Agentes Inteligentes (Jadex) | Simulam e analisam dados de saúde mental | Jadex BDI + Java | Acesso direto ao banco |
+| Banco de Dados (Persistência) | Armazena dados de sensores, análises e recomendações | H2 (dev) / PostgreSQL (prod) | JDBC (HikariCP) |
+| API REST (Backend) | Expõe endpoints para frontend | Spring Boot + Maven | HTTP (porta 8080) |
+| Dashboard Web (Frontend) | Visualiza dados e análises | React + Vite + Tailwind + Recharts | Requisições HTTP |
+
+---
+
+## Arquitetura Multiagente (Jadex)
+
+Os agentes seguem o modelo **BDI (Belief–Desire–Intention)**, cada um com crenças, objetivos e planos próprios.
+
+| Agente | Tipo | Função | Comunicação |
+|---------|------|---------|-------------|
+| Agente de Coleta de Dados | Sensor / Produtor | Simula sinais de saúde (sono, humor, atividade, FC) e grava no banco | `DatabaseManager.inserirDadosSaude()` |
+| Agente Analisador Emocional | Processador / Avaliador | Avalia dados recentes e classifica risco emocional (baixo/médio/alto) | `DatabaseManager.buscarDadosSaudeRecentes()` |
+| Agente de Recomendação | Atuador / Orientador | Gera recomendações personalizadas | `DatabaseManager.inserirRecomendacao()` |
+
+---
+
+## Sensores e Atuadores
+
+| Categoria | Elemento | Tipo | Função | Origem/Destino |
+|------------|-----------|------|---------|----------------|
+| Sensor | Sono (horas e qualidade) | Virtual | Mede descanso e recuperação emocional | Agente de Coleta |
+| Sensor | Humor | Virtual | Mede estado afetivo | Agente de Coleta |
+| Sensor | Atividade Física | Virtual | Indica movimento e engajamento | Agente de Coleta |
+| Sensor | Frequência Cardíaca | Virtual | Indica estresse e saúde física | Agente de Coleta |
+| Atuador | Análise Emocional | Lógico | Determina nível de risco emocional | Agente Analisador → Banco |
+| Atuador | Recomendações | Cognitivo | Gera ações preventivas e orientações | Agente de Recomendação → Banco/API |
+| Atuador | Visualização | Interativo | Exibe dados e alertas | API REST → Frontend |
+
+---
+
+## Banco de Dados
+
+O módulo `DatabaseManager.java` centraliza toda a persistência de dados, integrando os agentes e a API REST.
+
+### Principais Tabelas
+
+| Tabela | Descrição |
+|---------|------------|
+| `idosos` | Cadastro dos usuários monitorados |
+| `dados_saude` | Dados simulados dos sensores |
+| `analises_emocionais` | Classificações de risco |
+| `recomendacoes` | Sugestões personalizadas |
+
+### Funções Principais
+
+- `inserirDadosSaude()` → grava dados dos sensores  
+- `buscarDadosSaudeRecentes()` → consulta últimas medições  
+- `inserirAnaliseEmocional()` → registra o risco detectado  
+- `inserirRecomendacao()` → salva recomendações  
+- `listarIdosos()` → fornece dados para a API REST  
+
+---
+
+## Interface Web (Dashboard)
+
+A interface web foi desenvolvida em **React + Vite**, com foco em clareza e interatividade.  
+Ela exibe os dados dos idosos, gráficos de variação emocional e recomendações geradas pelos agentes.
+
+### Principais Funcionalidades
+
+- Visualização de métricas (humor, sono, atividade, FC)  
+- Classificação de risco emocional em tempo real  
+- Exibição de recomendações personalizadas  
+- Atualização automática via API REST  
+
+---
+
+## Instruções de Execução
+
+### 1. Executar o Sistema Multiagente (Jadex)
+
+```bash
+cd /workspaces/sistema_multiagentes_jadex_db_integrated
+mvn exec:java
+Executa os agentes (com.unieuro.Main).
+
+2. Iniciar a API REST (Spring Boot)
+bash
+Copy code
+cd /workspaces/sistema_multiagentes_jadex_db_integrated
+mvn spring-boot:run
+Acesse: http://localhost:8080
+
+3. Iniciar o Dashboard Web (React)
+bash
+Copy code
+cd /workspaces/sistema_multiagentes_jadex_db_integrated/health-dashboard
+npm install
+npm run dev
+Acesse: http://localhost:5173
+
+Tecnologias Utilizadas
+Camada	Tecnologias
+Agentes	Jadex BDI Framework, Java
+Backend	Spring Boot, Maven, HikariCP
+Banco de Dados	H2 (dev) / PostgreSQL (prod)
+Frontend	React, Vite, TailwindCSS, Recharts
+Integração	JDBC, REST API, JSON
+
+Repositório
+Clone o repositório e explore o código:
+
+bash
+Copy code
+git clone https://github.com/usuario/sistema_multiagentes_jadex_db_integrated.git
+yaml
+Copy code
+
+---
+
+Quer que eu adicione agora **badges técnicos (Java | Spring Boot | React | PostgreSQL)** no topo para deixar o README com aparência profissional no GitHub?
