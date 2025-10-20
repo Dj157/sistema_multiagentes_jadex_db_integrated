@@ -120,7 +120,7 @@ Ela exibe os dados dos idosos, gráficos de variação emocional e recomendaçõ
 
 ### 1. Executar o Sistema Multiagente (Jadex)
 
-```bash
+
 cd /workspaces/sistema_multiagentes_jadex_db_integrated
 mvn exec:java
 Executa os agentes (com.unieuro.Main).
@@ -159,4 +159,3 @@ Copy code
 
 ---
 
-Quer que eu adicione agora **badges técnicos (Java | Spring Boot | React | PostgreSQL)** no topo para deixar o README com aparência profissional no GitHub?
