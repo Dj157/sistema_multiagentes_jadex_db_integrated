@@ -174,3 +174,4 @@ Clone o repositório e explore o código:
 ```bash
 git clone https://github.com/Dj157/sistema_multiagentes_jadex_db_integrated.git
 ```
+link da apresentação: https://www.popai.pro/ppt-share?shareKey=3d9a2f5a3783f42c62192185868a74408022da1af0734f8e3efa04c0c5784615&utm_source=presentationsharepage
